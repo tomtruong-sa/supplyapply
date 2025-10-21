@@ -6,11 +6,7 @@ export async function onRequestPost(context) {
     const target =
       "https://script.google.com/macros/s/AKfycbyqQ8Dvb6M9FaULKa2_UGNaA-UTIRC2fhAteF4I5CYGAOIdRnhMkH54S39bbVj1quEz/exec";
 
-    const res = await fetch(target, {
-      method: "POST",
-      body,
-    });
-
+    const res = await fetch(target, { method: "POST", body });
     const text = await res.text();
 
     return new Response(text, {
