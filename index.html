@@ -30,8 +30,7 @@ document.getElementById("btnLogin").addEventListener("click", async () => {
   if (!name || !pass)
     return Swal.fire("Error", "Please enter username and password", "error");
 
-  const scriptURL =
-    "https://script.google.com/macros/s/AKfycbyqQ8Dvb6M9FaULKa2_UGNaA-UTIRC2fhAteF4I5CYGAOIdRnhMkH54S39bbVj1quEz/exec";
+  const scriptURL = "/api/gs-proxy";
 
   Swal.fire({
     title: "Checking...",
