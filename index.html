@@ -6,13 +6,48 @@
   <title>SupplyApply Login</title>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
-    body { font-family: Arial, sans-serif; background: #0f1829; display: flex; justify-content: center; align-items: center; height: 100vh; color: #fff; }
-    .login-box { background: #1e2a44; padding: 30px; border-radius: 10px; box-shadow: 0 0 15px rgba(0,0,0,0.3); width: 320px; }
-    input { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #444; border-radius: 6px; background: #0f1829; color: #fff; }
-    button { width: 100%; padding: 10px; border: none; border-radius: 6px; background: #007bff; color: #fff; font-weight: 600; cursor: pointer; }
-    button:hover { background: #0056b3; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #0f1829;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: #fff;
+      margin: 0;
+    }
+    .login-box {
+      background: #1e2a44;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.3);
+      width: 320px;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border: 1px solid #444;
+      border-radius: 6px;
+      background: #0f1829;
+      color: #fff;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      background: #007bff;
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0056b3;
+    }
   </style>
 </head>
+
 <body>
   <div class="login-box">
     <h2 style="text-align:center;">🔐 SupplyApply Login</h2>
@@ -21,59 +56,70 @@
     <button id="btnLogin">Login</button>
   </div>
 
+  <!-- ✅ Script để login -->
   <script>
-  // === LOGIN (final stable version) ===
- // ✅ Đặt biến toàn cục ở đầu, ngoài mọi hàm
-  const proxyURL = "https://441f11b4.supplyapply.pages.dev/api/gs-proxy";
+    // 🌐 Khai báo biến toàn cục
+    const proxyURL = "https://441f11b4.supplyapply.pages.dev/api/gs-proxy";
 
-  document.addEventListener("DOMContentLoaded", () => {
-    const loginBtn = document.getElementById("btnLogin");
-    if (!loginBtn) {
-      console.error("❌ Button #btnLogin not found!");
-      return;
-    }
-
-    loginBtn.addEventListener("click", async () => {
-      const name = document.getElementById("loginName").value.trim();
-      const pass = document.getElementById("loginPass").value.trim();
-
-      if (!name || !pass)
-        return Swal.fire("Error", "Please enter username and password", "error");
-
-      Swal.fire({
-        title: "Checking...",
-        allowOutsideClick: false,
-        didOpen: () => Swal.showLoading(),
-      });
-
-      try {
-        console.log("🌐 Using proxy:", proxyURL);
-        const res = await fetch(
-          `${proxyURL}?action=checkUserLogin&name=${encodeURIComponent(name)}&pass=${encodeURIComponent(pass)}`
-        );
-        const data = await res.json();
-        console.log("✅ Response:", data);
-
-        if (data.status === "ok") {
-          Swal.fire({
-            icon: "success",
-            title: `Welcome ${data.user.name}`,
-            text: `Role: ${data.user.role}`,
-            timer: 1500,
-            showConfirmButton: false,
-          }).then(() => {
-            localStorage.setItem("currentUser", JSON.stringify(data.user));
-            location.reload();
-          });
-        } else {
-          Swal.fire("Error", data.message || "Invalid username or password", "error");
-        }
-      } catch (err) {
-        console.error("❌ Fetch error:", err);
-        Swal.fire("Error", "Cannot connect to server. Please try again.", "error");
+    // Đảm bảo chạy sau khi DOM đã sẵn sàng
+    document.addEventListener("DOMContentLoaded", () => {
+      const loginBtn = document.getElementById("btnLogin");
+      if (!loginBtn) {
+        console.error("❌ Button #btnLogin not found!");
+        return;
       }
+
+      loginBtn.addEventListener("click", async () => {
+        const name = document.getElementById("loginName").value.trim();
+        const pass = document.getElementById("loginPass").value.trim();
+
+        if (!name || !pass)
+          return Swal.fire("Error", "Please enter username and password", "error");
+
+        Swal.fire({
+          title: "Checking...",
+          allowOutsideClick: false,
+          didOpen: () => Swal.showLoading(),
+        });
+
+        try {
+          console.log("🌐 Using proxy:", proxyURL);
+
+          const res = await fetch(
+            `${proxyURL}?action=checkUserLogin&name=${encodeURIComponent(name)}&pass=${encodeURIComponent(pass)}`,
+            { method: "GET" }
+          );
+
+          const text = await res.text();
+          console.log("🧩 Raw response:", text);
+
+          let data;
+          try {
+            data = JSON.parse(text);
+          } catch {
+            data = { status: "error", message: "Invalid JSON response" };
+          }
+
+          if (data.status === "ok") {
+            Swal.fire({
+              icon: "success",
+              title: `Welcome ${data.user.name}`,
+              text: `Role: ${data.user.role}`,
+              timer: 1500,
+              showConfirmButton: false,
+            }).then(() => {
+              localStorage.setItem("currentUser", JSON.stringify(data.user));
+              location.reload();
+            });
+          } else {
+            Swal.fire("Error", data.message || "Invalid username or password", "error");
+          }
+        } catch (err) {
+          console.error("❌ Fetch error:", err);
+          Swal.fire("Error", "Cannot connect to server. Please try again.", "error");
+        }
+      });
     });
-  });
   </script>
 </body>
-</html> 
+</html>
