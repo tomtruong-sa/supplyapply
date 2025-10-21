@@ -23,15 +23,7 @@
 
   <script>
   // === LOGIN (final stable version) ===
-document.getElementById("btnLogin").addEventListener("click", async () => {
-  const name = document.getElementById("loginName").value.trim();
-  const pass = document.getElementById("loginPass").value.trim();
-
-  if (!name || !pass)
-    return Swal.fire("Error", "Please enter username and password", "error");
-
-  // ✅ Khai báo rõ ràng đường dẫn proxy của Cloudflare
-  // ✅ Khai báo proxyURL toàn cục ngay đầu script
+ // ✅ Đặt biến proxyURL bên ngoài hoàn toàn, toàn cục
   const proxyURL = "https://441f11b4.supplyapply.pages.dev/api/gs-proxy";
 
   document.getElementById("btnLogin").addEventListener("click", async () => {
