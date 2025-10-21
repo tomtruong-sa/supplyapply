@@ -32,35 +32,39 @@
     const scriptURL = "https://script.google.com/macros/s/AKfycbyqQ8Dvb6M9FaULKa2_UGNaA-UTIRC2fhAteF4I5CYGAOIdRnhMkH54S39bbVj1quEz/exec";
 
     try {
-      const formData = new FormData();
-      formData.append("action", "checkUserLogin");
-      formData.append("name", name);
-      formData.append("pass", pass);
+  const res = await fetch("https://script.google.com/macros/s/AKfycbz9fcuw_DXVxWVOm00QvvIjJfrFZwb8tyARkK34Zn3zTvAwdYfixCWDaplJk8cj82Dy/exec", {
+    method: "POST",
+    body: formData,
+    mode: "no-cors" // 🟢 tránh bị block preflight
+  });
 
-      const res = await fetch(scriptURL, { method: "POST", body: formData });
-      const json = await res.json();
+  // 🧠 do no-cors không cho đọc trực tiếp, nên ta gửi thêm bản GET để lấy kết quả test
+  const test = await fetch("https://script.google.com/macros/s/AKfycbz9fcuw_DXVxWVOm00QvvIjJfrFZwb8tyARkK34Zn3zTvAwdYfixCWDaplJk8cj82Dy/exec?action=checkUserLogin&name=" + encodeURIComponent(name) + "&pass=" + encodeURIComponent(pass));
+  const text = await test.text();
 
-      if (json.status === "ok") {
-        Swal.fire({
-          icon: "success",
-          title: `Welcome ${json.user.name}`,
-          text: `Role: ${json.user.role}`,
-          timer: 1500,
-          showConfirmButton: false
-        }).then(() => {
-          localStorage.setItem("currentUser", JSON.stringify(json.user));
-          document.body.innerHTML = `
-            <h2 style='text-align:center;margin-top:50px;'>
-              Welcome ${json.user.name} (${json.user.role}) 🎉
-            </h2>`;
-        });
-      } else {
-        Swal.fire("Error", json.message || "Invalid username or password", "error");
-      }
-    } catch (err) {
-      console.error("❌ Fetch error:", err);
-      Swal.fire("Error", "Cannot connect to server. Please try again.", "error");
-    }
+  let data;
+  try { data = JSON.parse(text); } 
+  catch { data = { status: "error", message: "Invalid response" }; }
+
+  if (data.status === "ok") {
+    Swal.fire({
+      icon: "success",
+      title: `Welcome ${data.user.name}`,
+      text: `Role: ${data.user.role}`,
+      timer: 1500,
+      showConfirmButton: false
+    }).then(() => {
+      localStorage.setItem("currentUser", JSON.stringify(data.user));
+      location.reload();
+    });
+  } else {
+    Swal.fire("Error", data.message || "Invalid username or password", "error");
+  }
+
+} catch (err) {
+  console.error("❌ Fetch error:", err);
+  Swal.fire("Error", "Cannot connect to server. Please try again.", "error");
+}
   });
   </script>
 </body>
