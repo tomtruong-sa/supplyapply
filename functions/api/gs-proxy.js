@@ -1,4 +1,5 @@
 export async function onRequest({ request }) {
+  // Thay đổi target tới Google Apps Script của bạn
   const target =
     "https://script.google.com/macros/s/AKfycbyqQ8Dvb6M9FaULKa2_UGNaA-UTIRC2fhAteF4I5CYGAOIdRnhMkH54S39bbVj1quEz/exec";
 
@@ -15,23 +16,21 @@ export async function onRequest({ request }) {
 
   try {
     const url = new URL(request.url);
-    const query = url.search || "";
+    const query = url.search || ""; // Lấy toàn bộ Query String (bao gồm name & pass)
 
     // ✅ 2️⃣ Cấu hình request gửi tới Google Apps Script
+    // Dùng method của request gốc (mà frontend đang gửi là GET)
     const fetchOptions = {
-      method: request.method,
+      method: request.method, 
       redirect: "follow",
       headers: {
         "User-Agent": "Cloudflare-Worker",
-        "Content-Type": "application/x-www-form-urlencoded;charset=utf-8",
       },
+      // KHÔNG cần body
     };
 
-    if (request.method === "POST") {
-      fetchOptions.body = await request.text();
-    }
-
     // ✅ 3️⃣ Gửi request tới Apps Script
+    // Gửi target URL + Query String (có action, name, pass)
     const response = await fetch(target + query, fetchOptions);
 
     if (!response.ok) {
