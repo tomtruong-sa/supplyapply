@@ -23,46 +23,56 @@
 
   <script>
   // === LOGIN (final stable version) ===
- // ✅ Đặt biến proxyURL bên ngoài hoàn toàn, toàn cục
+ // ✅ Đặt biến toàn cục ở đầu, ngoài mọi hàm
   const proxyURL = "https://441f11b4.supplyapply.pages.dev/api/gs-proxy";
 
-  document.getElementById("btnLogin").addEventListener("click", async () => {
-    const name = document.getElementById("loginName").value.trim();
-    const pass = document.getElementById("loginPass").value.trim();
-
-    if (!name || !pass)
-      return Swal.fire("Error", "Please enter username and password", "error");
-
-    Swal.fire({
-      title: "Checking...",
-      allowOutsideClick: false,
-      didOpen: () => Swal.showLoading(),
-    });
-
-    try {
-      const res = await fetch(
-        `${proxyURL}?action=checkUserLogin&name=${encodeURIComponent(name)}&pass=${encodeURIComponent(pass)}`
-      );
-      const data = await res.json();
-
-      if (data.status === "ok") {
-        Swal.fire({
-          icon: "success",
-          title: `Welcome ${data.user.name}`,
-          text: `Role: ${data.user.role}`,
-          timer: 1500,
-          showConfirmButton: false,
-        }).then(() => {
-          localStorage.setItem("currentUser", JSON.stringify(data.user));
-          location.reload();
-        });
-      } else {
-        Swal.fire("Error", data.message || "Invalid username or password", "error");
-      }
-    } catch (err) {
-      console.error("❌ Fetch error:", err);
-      Swal.fire("Error", "Cannot connect to server. Please try again.", "error");
+  document.addEventListener("DOMContentLoaded", () => {
+    const loginBtn = document.getElementById("btnLogin");
+    if (!loginBtn) {
+      console.error("❌ Button #btnLogin not found!");
+      return;
     }
+
+    loginBtn.addEventListener("click", async () => {
+      const name = document.getElementById("loginName").value.trim();
+      const pass = document.getElementById("loginPass").value.trim();
+
+      if (!name || !pass)
+        return Swal.fire("Error", "Please enter username and password", "error");
+
+      Swal.fire({
+        title: "Checking...",
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading(),
+      });
+
+      try {
+        console.log("🌐 Using proxy:", proxyURL);
+        const res = await fetch(
+          `${proxyURL}?action=checkUserLogin&name=${encodeURIComponent(name)}&pass=${encodeURIComponent(pass)}`
+        );
+        const data = await res.json();
+        console.log("✅ Response:", data);
+
+        if (data.status === "ok") {
+          Swal.fire({
+            icon: "success",
+            title: `Welcome ${data.user.name}`,
+            text: `Role: ${data.user.role}`,
+            timer: 1500,
+            showConfirmButton: false,
+          }).then(() => {
+            localStorage.setItem("currentUser", JSON.stringify(data.user));
+            location.reload();
+          });
+        } else {
+          Swal.fire("Error", data.message || "Invalid username or password", "error");
+        }
+      } catch (err) {
+        console.error("❌ Fetch error:", err);
+        Swal.fire("Error", "Cannot connect to server. Please try again.", "error");
+      }
+    });
   });
   </script>
 </body>
