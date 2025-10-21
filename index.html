@@ -1,125 +1,112 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SupplyApply Login</title>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #0f1829;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      color: #fff;
-      margin: 0;
-    }
-    .login-box {
-      background: #1e2a44;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.3);
-      width: 320px;
-    }
-    input {
-      width: 100%;
-      padding: 10px;
-      margin: 8px 0;
-      border: 1px solid #444;
-      border-radius: 6px;
-      background: #0f1829;
-      color: #fff;
-    }
-    button {
-      width: 100%;
-      padding: 10px;
-      border: none;
-      border-radius: 6px;
-      background: #007bff;
-      color: #fff;
-      font-weight: 600;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #0056b3;
-    }
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SupplyApply Login</title>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0f1829;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: #fff;
+      margin: 0;
+    }
+    .login-box {
+      background: #1e2a44;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.3);
+      width: 320px;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border: 1px solid #444;
+      border-radius: 6px;
+      background: #0f1829;
+      color: #fff;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      background: #007bff;
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+  </style>
 </head>
 
 <body>
-  <div class="login-box">
-    <h2 style="text-align:center;">🔐 SupplyApply Login</h2>
-    <input id="loginName" placeholder="Username" />
-    <input id="loginPass" type="password" placeholder="Password" />
-    <button id="btnLogin">Login</button>
-  </div>
+  <div class="login-box">
+    <h2 style="text-align:center;">🔐 SupplyApply Login</h2>
+    <input id="loginName" placeholder="Username" />
+    <input id="loginPass" type="password" placeholder="Password" />
+    <button id="btnLogin">Login</button>
+  </div>
 
-  <!-- ✅ Script để login -->
-  <script>
-    // 🌐 Khai báo biến toàn cục
-    const proxyURL = "https://441f11b4.supplyapply.pages.dev/api/gs-proxy";
+  <script>
+    // 🌐 KHAI BÁO PROXY URL CỦA CLOUDFLARE PAGES FUNCTION
+    const proxyURL = "https://441f11b4.supplyapply.pages.dev/api/gs-proxy";
 
-    // Đảm bảo chạy sau khi DOM đã sẵn sàng
-    document.addEventListener("DOMContentLoaded", () => {
-      const loginBtn = document.getElementById("btnLogin");
-      if (!loginBtn) {
-        console.error("❌ Button #btnLogin not found!");
-        return;
-      }
+    document.addEventListener("DOMContentLoaded", () => {
+      const loginBtn = document.getElementById("btnLogin");
+      if (!loginBtn) return;
 
-      loginBtn.addEventListener("click", async () => {
-        const name = document.getElementById("loginName").value.trim();
-        const pass = document.getElementById("loginPass").value.trim();
+      loginBtn.addEventListener("click", async () => {
+        const name = document.getElementById("loginName").value.trim();
+        const pass = document.getElementById("loginPass").value.trim();
 
-        if (!name || !pass)
-          return Swal.fire("Error", "Please enter username and password", "error");
+        if (!name || !pass)
+          return Swal.fire("Error", "Please enter username and password", "error");
 
-        Swal.fire({
-          title: "Checking...",
-          allowOutsideClick: false,
-          didOpen: () => Swal.showLoading(),
-        });
+        Swal.fire({
+          title: "Checking...",
+          allowOutsideClick: false,
+          didOpen: () => Swal.showLoading(),
+        });
 
-        try {
-          console.log("🌐 Using proxy:", proxyURL);
+        try {
+          // ⭐ Dùng GET và truyền data qua Query String
+          const res = await fetch(
+            `${proxyURL}?action=checkUserLogin&name=${encodeURIComponent(name)}&pass=${encodeURIComponent(pass)}`
+          );
+          
+          const data = await res.json();
 
-          const res = await fetch(
-            `${proxyURL}?action=checkUserLogin&name=${encodeURIComponent(name)}&pass=${encodeURIComponent(pass)}`,
-            { method: "GET" }
-          );
-
-          const text = await res.text();
-          console.log("🧩 Raw response:", text);
-
-          let data;
-          try {
-            data = JSON.parse(text);
-          } catch {
-            data = { status: "error", message: "Invalid JSON response" };
-          }
-
-          if (data.status === "ok") {
-            Swal.fire({
-              icon: "success",
-              title: `Welcome ${data.user.name}`,
-              text: `Role: ${data.user.role}`,
-              timer: 1500,
-              showConfirmButton: false,
-            }).then(() => {
-              localStorage.setItem("currentUser", JSON.stringify(data.user));
-              location.reload();
-            });
-          } else {
-            Swal.fire("Error", data.message || "Invalid username or password", "error");
-          }
-        } catch (err) {
-          console.error("❌ Fetch error:", err);
-          Swal.fire("Error", "Cannot connect to server. Please try again.", "error");
-        }
-      });
-    });
-  </script>
+          if (data.status === "ok") {
+            Swal.fire({
+              icon: "success",
+              title: `Welcome ${data.user.name}`,
+              text: `Role: ${data.user.role}`,
+              timer: 1500,
+              showConfirmButton: false,
+            }).then(() => {
+              localStorage.setItem("currentUser", JSON.stringify(data.user));
+              // TODO: Chuyển hướng đến trang chính thay vì reload
+              location.reload(); 
+            });
+          } else {
+            Swal.fire("Error", data.message || "Invalid username or password", "error");
+          }
+        } catch (err) {
+          console.error("❌ Fetch error:", err);
+          Swal.fire("Error", "Cannot connect to server. Please try again.", "error");
+        }
+      });
+    });
+  </script>
 </body>
 </html>
