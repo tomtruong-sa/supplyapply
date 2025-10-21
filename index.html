@@ -1,112 +1,237 @@
+Chuyển đến nội dung
+Lịch sử đoạn chat
+
+Bạn đã nói:
+cái nào dán vào github
+ChatGPT đã nói:
+Gus ơi, để mình chỉ rõ nhé 👇
+
+Nếu bạn đang triển khai web app qua GitHub + Cloudflare Pages, thì chỉ cần dán các file frontend (HTML, CSS, JS) vào GitHub thôi. Cụ thể:
+
+🧩 1. Dán vào GitHub
+Dán các file sau vào repository trên GitHub (ví dụ: SupplyApply-Dashboard):
+
+File	Vị trí	Ghi chú
+index.html (hoặc Index.html)	gốc repo	Đây là giao diện chính — chứa HTML, CSS, JS của bạn
+style.css (nếu có)	cùng thư mục hoặc trong /assets/css/	CSS tách riêng nếu bạn không nhúng trực tiếp
+script.js (nếu có)	cùng thư mục hoặc trong /assets/js/	JavaScript tách riêng nếu không viết inline trong HTML
+.gitignore	gốc repo	(tuỳ chọn) để bỏ qua file cục bộ như .DS_Store
+README.md	gốc repo	(tuỳ chọn) mô tả dự án, ví dụ: cách deploy lên Cloudflare
+☁️ 2. KHÔNG dán vào GitHub
+Các file sau không cần hoặc không nên đưa lên GitHub:
+
+File	Lý do
+Code.gs (Apps Script)	Đây là backend chạy trên Google Script — không chạy được qua GitHub
+credentials.json, token.json	Thông tin bảo mật — tuyệt đối không commit
+File .zip hoặc backup cũ	Không cần thiết cho build frontend
+🚀 3. Cloudflare Pages tự build
+Khi Cloudflare Pages nhận repo, nó sẽ tự nhận index.html làm trang chính.
+Sau khi push code, Cloudflare sẽ cấp URL dạng:
+https://<tên-dự-án>.pages.dev
+
+👉 Tóm lại:
+
+Chỉ cần dán index.html (và các file CSS/JS tĩnh) vào GitHub — KHÔNG cần Code.gs.
+
+Bạn gửi mình cấu trúc repo hiện tại (ví dụ: bạn đang có file nào trong đó) để mình chỉ rõ phần nào nên xóa hoặc giữ lại nhé?
+
+Bạn đã nói:
+Rất tốt, Gus 💪 — giờ ta đến bước cuối cùng để hoàn thiện và chạy mượt trên GitHub + Cloudflare Pages.
+Anh chỉ cần dán 2 file duy nhất vào repo GitHub của mình (supplyapply).
+
+🟩 1️⃣ File đầu tiên – index.html
+
+(Trang login, tự động chuyển sang dashboard sau khi đăng nhập thành công)
+
+👉 Cách dán:
+
+Vào GitHub → Repo supplyapply
+
+Chọn index.html
+
+Nhấn ✏️ (Edit this file)
+
+Xóa toàn bộ nội dung cũ
+
+Dán toàn bộ code sau đây:
+ChatGPT đã nói:
+Tốt rồi Gus 💪
+Giờ mình sẽ gửi file đầu tiên index.html đúng chuẩn để bạn dán thẳng vào GitHub.
+Chỉ cần làm theo đúng thứ tự này nhé 👇
+
+🟩 1️⃣ Cách dán file
+Trên GitHub repo SupplyApply của bạn:
+
+Mở file index.html
+
+Nhấn ✏️ Edit this file
+
+Xóa toàn bộ nội dung cũ
+
+Dán nguyên đoạn code dưới đây
+
+Kéo xuống cuối → Commit changes
+
+📄 File: index.html
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SupplyApply Login</title>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #0f1829;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      color: #fff;
-      margin: 0;
-    }
-    .login-box {
-      background: #1e2a44;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.3);
-      width: 320px;
-    }
-    input {
-      width: 100%;
-      padding: 10px;
-      margin: 8px 0;
-      border: 1px solid #444;
-      border-radius: 6px;
-      background: #0f1829;
-      color: #fff;
-    }
-    button {
-      width: 100%;
-      padding: 10px;
-      border: none;
-      border-radius: 6px;
-      background: #007bff;
-      color: #fff;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.3s ease;
-    }
-    button:hover {
-      background: #0056b3;
-    }
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SupplyApply Login</title>
+
+  <!-- SweetAlert -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+      background: linear-gradient(135deg, #1f2a44, #273a5a);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      color: #fff;
+    }
+
+    .login-box {
+      width: 350px;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 30px 35px;
+      border-radius: 16px;
+      box-shadow: 0 4px 25px rgba(0,0,0,0.3);
+      backdrop-filter: blur(10px);
+    }
+
+    .login-box h2 {
+      text-align: center;
+      margin-bottom: 25px;
+      font-size: 22px;
+      letter-spacing: 1px;
+    }
+
+    .input-group {
+      margin-bottom: 18px;
+      position: relative;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 10px 35px 10px 10px;
+      border: none;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.9);
+      font-size: 15px;
+      color: #333;
+    }
+
+    .input-group i {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #666;
+      cursor: pointer;
+    }
+
+    #btnLogin {
+      width: 100%;
+      background: #00bfa6;
+      border: none;
+      padding: 10px;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    #btnLogin:hover {
+      background: #00a88f;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 13px;
+      color: #ccc;
+    }
+  </style>
 </head>
 
 <body>
-  <div class="login-box">
-    <h2 style="text-align:center;">🔐 SupplyApply Login</h2>
-    <input id="loginName" placeholder="Username" />
-    <input id="loginPass" type="password" placeholder="Password" />
-    <button id="btnLogin">Login</button>
-  </div>
+  <div class="login-box">
+    <h2>SupplyApply Dashboard</h2>
 
-  <script>
-    // 🌐 KHAI BÁO PROXY URL CỦA CLOUDFLARE PAGES FUNCTION
-    const proxyURL = "https://441f11b4.supplyapply.pages.dev/api/gs-proxy";
+    <div class="input-group">
+      <input type="text" id="loginName" placeholder="Username" autocomplete="off" />
+      <i class="bi bi-person"></i>
+    </div>
 
-    document.addEventListener("DOMContentLoaded", () => {
-      const loginBtn = document.getElementById("btnLogin");
-      if (!loginBtn) return;
+    <div class="input-group">
+      <input type="password" id="loginPass" placeholder="Password" />
+      <i class="bi bi-eye" id="togglePass"></i>
+    </div>
 
-      loginBtn.addEventListener("click", async () => {
-        const name = document.getElementById("loginName").value.trim();
-        const pass = document.getElementById("loginPass").value.trim();
+    <button id="btnLogin">Login</button>
 
-        if (!name || !pass)
-          return Swal.fire("Error", "Please enter username and password", "error");
+    <div class="footer">© 2025 Supply & Apply</div>
+  </div>
 
-        Swal.fire({
-          title: "Checking...",
-          allowOutsideClick: false,
-          didOpen: () => Swal.showLoading(),
-        });
+  <script>
+    // 🌐 Proxy URL qua Cloudflare Functions
+    const proxyURL = "https://441f11b4.supplyapply.pages.dev/api/gs-proxy";
 
-        try {
-          // ⭐ Dùng GET và truyền data qua Query String
-          const res = await fetch(
-            `${proxyURL}?action=checkUserLogin&name=${encodeURIComponent(name)}&pass=${encodeURIComponent(pass)}`
-          );
-          
-          const data = await res.json();
+    // 👁️ Toggle hiển thị mật khẩu
+    document.getElementById("togglePass").addEventListener("click", function() {
+      const passField = document.getElementById("loginPass");
+      if (passField.type === "password") {
+        passField.type = "text";
+        this.className = "bi bi-eye-slash";
+      } else {
+        passField.type = "password";
+        this.className = "bi bi-eye";
+      }
+    });
 
-          if (data.status === "ok") {
-            Swal.fire({
-              icon: "success",
-              title: `Welcome ${data.user.name}`,
-              text: `Role: ${data.user.role}`,
-              timer: 1500,
-              showConfirmButton: false,
-            }).then(() => {
-              localStorage.setItem("currentUser", JSON.stringify(data.user));
-              // TODO: Chuyển hướng đến trang chính thay vì reload
-              location.reload(); 
-            });
-          } else {
-            Swal.fire("Error", data.message || "Invalid username or password", "error");
-          }
-        } catch (err) {
-          console.error("❌ Fetch error:", err);
-          Swal.fire("Error", "Cannot connect to server. Please try again.", "error");
-        }
-      });
-    });
-  </script>
+    // 🚀 Xử lý login
+    document.getElementById("btnLogin").addEventListener("click", async () => {
+      const name = document.getElementById("loginName").value.trim();
+      const pass = document.getElementById("loginPass").value.trim();
+
+      if (!name || !pass)
+        return Swal.fire("Error", "Please enter username and password", "error");
+
+      Swal.fire({ title: "Checking...", allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+      try {
+        // Gửi yêu cầu GET đến Apps Script qua Cloudflare
+        const url = `${proxyURL}?action=login&user=${encodeURIComponent(name)}&pass=${encodeURIComponent(pass)}`;
+        const res = await fetch(url);
+        const data = await res.json();
+
+        Swal.close();
+
+        if (data.success) {
+          Swal.fire({
+            icon: "success",
+            title: "Login successful!",
+            timer: 1200,
+            showConfirmButton: false
+          }).then(() => {
+            window.location.href = "dashboard.html"; // ← chuyển sang Dashboard
+          });
+        } else {
+          Swal.fire("Error", data.message || "Invalid username or password", "error");
+        }
+      } catch (err) {
+        Swal.fire("Error", "Unable to connect to server", "error");
+        console.error(err);
+      }
+    });
+  </script>
 </body>
 </html>
