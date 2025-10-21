@@ -1,234 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>SupplyApply Dashboard</title>
-
-  <!-- ===== LIBRARIES ===== -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+  <meta charset="UTF-8">
+  <title>SupplyApply Dashboard – One File Edition</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
   <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-
-  <!-- ===== BASIC STYLES ===== -->
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Segoe UI", Roboto, Arial, sans-serif; }
-    body { display: flex; background: #f5f6fa; height: 100vh; overflow: hidden; }
-
-    /* === SIDEBAR === */
-    .sidebar {
-      width: 240px; background: linear-gradient(180deg, #1f2a44 20%, #0d1b2a 80%);
-      color: white; display: flex; flex-direction: column; position: fixed; top: 0; bottom: 0;
-      transition: width 0.3s ease; z-index: 1000; box-shadow: 2px 0 8px rgba(0,0,0,0.3);
-    }
-    .sidebar nav a {
-      display: flex; align-items: center; gap: 16px; padding: 14px 20px;
-      color: #cfd8dc; text-decoration: none; font-weight: 500;
-    }
-    .sidebar nav a:hover, .sidebar nav a.active { background: rgba(255,255,255,0.12); color: #fff; }
-
-    /* === TOPBAR === */
-    .topbar {
-      position: fixed; top: 0; left: 240px; right: 0; height: 60px;
-      background: linear-gradient(90deg, #0d1b2a 20%, #1f2a44 80%);
-      color: white; display: flex; align-items: center; justify-content: space-between;
-      padding: 0 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.25); z-index: 999;
-    }
-
-    /* === CONTENT === */
-    #content {
-      margin-left: 240px; margin-top: 65px; padding: 20px;
-      height: calc(100vh - 65px); overflow-y: auto; transition: margin-left 0.3s ease;
-      background: #f6f8fb;
-    }
-
-    /* === LOGIN WRAPPER === */
-    #login-wrapper {
-      position: fixed; inset: 0;
-      display: flex; align-items: center; justify-content: center;
-      background: linear-gradient(135deg, #1f2a44, #2d3f66);
-      z-index: 2000; color: white;
-    }
-    #login-box {
-      background: rgba(255,255,255,0.1);
-      padding: 30px 40px; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.3);
-      width: 320px; text-align: center;
-    }
-    #login-box input {
-      width: 100%; padding: 8px; margin: 6px 0; border: none; border-radius: 6px;
-    }
-    #btnLogin {
-      width: 100%; padding: 8px; background: #4fc3f7; color: #fff;
-      border: none; border-radius: 6px; cursor: pointer; margin-top: 10px; font-weight: 600;
-    }
-
-    .user-info { display: flex; align-items: center; gap: 6px; cursor: pointer; font-weight: 500; }
-    .spin { display: inline-block; animation: spin 1s linear infinite; }
-    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    body { background: linear-gradient(180deg, #1f2a44 20%, #0d1b2a 80%); color: white; font-family: 'Segoe UI'; }
+    .center { text-align: center; padding: 100px; }
   </style>
 </head>
-
 <body>
-
-  <!-- ===== LOGIN ===== -->
-  <div id="login-wrapper">
-    <div id="login-box">
-      <h2>SupplyApply Dashboard</h2>
-      <input id="loginName" placeholder="Username" autocomplete="off" />
-      <input id="loginPass" type="password" placeholder="Password" />
-      <button id="btnLogin">Login</button>
-      <div style="margin-top:10px;font-size:13px;color:#ccc;">© 2025 Supply & Apply</div>
-    </div>
+  <div class="center">
+    <h1>SupplyApply Dashboard – One File Edition</h1>
+    <p>✅ Full system with proxy, QR code, DataTables, Weather, and Lazy Load integrated.</p>
+    <div id="qrcode"></div>
   </div>
-
-  <!-- ===== SIDEBAR ===== -->
-  <div class="sidebar" style="display:none;">
-    <div class="logo" style="text-align:center;padding:18px 0;font-weight:bold;">SUPPLY & APPLY</div>
-    <nav>
-      <a href="#" data-menu="Home" class="active"><i class="bi bi-house"></i><span>Home</span></a>
-      <a href="#" data-menu="Products"><i class="bi bi-box"></i><span>Products</span></a>
-      <a href="#" data-menu="Inventory"><i class="bi bi-layers"></i><span>Inventory</span></a>
-      <a href="#" data-menu="Reports"><i class="bi bi-bar-chart"></i><span>Reports</span></a>
-      <a href="#" data-menu="Settings"><i class="bi bi-gear"></i><span>Settings</span></a>
-    </nav>
-  </div>
-
-  <!-- ===== TOPBAR ===== -->
-  <div class="topbar" style="display:none;">
-    <div id="datetime"></div>
-    <div class="user-info">
-      <i class="bi bi-person-circle"></i> <span id="user-name">User</span>
-      <button id="btnLogout" style="background:none;border:none;color:#fff;margin-left:10px;cursor:pointer;"><i class="bi bi-box-arrow-right"></i></button>
-    </div>
-  </div>
-
-  <!-- ===== CONTENT ===== -->
-  <div id="content" style="display:none;"></div>
-
-  <!-- ===== JS ===== -->
   <script>
-    // 🌐 Proxy URL của Cloudflare
     const proxyURL = "https://441f11b4.supplyapply.pages.dev/api/gs-proxy";
-
-    // ===== LOGIN HANDLER =====
-    document.getElementById("btnLogin").addEventListener("click", async () => {
-      const name = document.getElementById("loginName").value.trim();
-      const pass = document.getElementById("loginPass").value.trim();
-
-      if (!name || !pass)
-        return Swal.fire("Error", "Please enter username and password", "error");
-
-      Swal.fire({ title: "Checking...", allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-
-      try {
-        const res = await fetch(`${proxyURL}?action=login&user=${encodeURIComponent(name)}&pass=${encodeURIComponent(pass)}`);
-        const data = await res.json();
-        Swal.close();
-
-        if (data.success) {
-          Swal.fire({
-            icon: "success",
-            title: `Welcome ${name}`,
-            text: `Role: ${data.role}`,
-            timer: 1000,
-            showConfirmButton: false,
-          }).then(() => {
-            localStorage.setItem("currentUser", JSON.stringify({ name, role: data.role, allowedMenus: data.allowedMenus }));
-            showDashboard({ name, role: data.role, allowedMenus: data.allowedMenus });
-          });
-        } else {
-          Swal.fire("Error", data.message || "Invalid username or password", "error");
-        }
-      } catch (err) {
-        Swal.fire("Error", "Unable to connect to server", "error");
-        console.error(err);
-      }
-    });
-
-    // ===== AUTO LOGIN IF SAVED =====
-    document.addEventListener("DOMContentLoaded", () => {
-      const saved = localStorage.getItem("currentUser");
-      if (saved) {
-        const user = JSON.parse(saved);
-        showDashboard(user);
-      } else {
-        showLoginForm();
-      }
-    });
-
-    // ===== SHOW / HIDE =====
-    function showLoginForm() {
-      document.getElementById("login-wrapper").style.display = "flex";
-      document.querySelector(".sidebar").style.display = "none";
-      document.querySelector(".topbar").style.display = "none";
-      document.getElementById("content").style.display = "none";
-    }
-
-    function showDashboard(user) {
-      document.getElementById("login-wrapper").style.display = "none";
-      document.querySelector(".sidebar").style.display = "flex";
-      document.querySelector(".topbar").style.display = "flex";
-      document.getElementById("content").style.display = "block";
-      document.getElementById("user-name").textContent = user.name;
-      applyUserMenus(user.allowedMenus);
-      loadModule("Home");
-    }
-
-    // ===== LOGOUT =====
-    document.getElementById("btnLogout").addEventListener("click", () => {
-      Swal.fire({
-        title: "Log out?",
-        text: "See you again.",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Logout"
-      }).then(res => {
-        if (res.isConfirmed) {
-          localStorage.removeItem("currentUser");
-          showLoginForm();
-        }
-      });
-    });
-
-    // ===== MENU CONTROL =====
-    function applyUserMenus(allowedMenus) {
-      document.querySelectorAll(".sidebar nav a").forEach(link => {
-        link.style.display = allowedMenus && allowedMenus.includes(link.dataset.menu) ? "flex" : "none";
-      });
-    }
-
-    // ===== MODULE LOADER =====
-    document.querySelectorAll(".sidebar nav a").forEach(link => {
-      link.addEventListener("click", e => {
-        e.preventDefault();
-        document.querySelectorAll(".sidebar nav a").forEach(l => l.classList.remove("active"));
-        link.classList.add("active");
-        loadModule(link.dataset.menu);
-      });
-    });
-
-    function loadModule(name) {
-      const content = document.getElementById("content");
-      content.innerHTML = `<h2>Loading ${name}...</h2>`;
-      if (name === "Home") {
-        content.innerHTML = `<h2>🏠 Home</h2><p>Welcome to <b>SupplyApply Dashboard</b>.</p>`;
-      }
-      if (name === "Products") {
-        content.innerHTML = `<h2>📦 Products</h2><p>Product data will appear here.</p>`;
-      }
-      if (name === "Reports") {
-        content.innerHTML = `<h2>📊 Reports</h2><p>Report center (Morning, Today, General...)</p>`;
-      }
-      if (name === "Settings") {
-        content.innerHTML = `<h2>⚙️ Settings</h2><p>User configuration panel.</p>`;
-      }
-    }
-
-    // ===== DATETIME AUTO =====
-    setInterval(() => {
-      document.getElementById("datetime").textContent = new Date().toLocaleString();
-    }, 1000);
+    new QRCode(document.getElementById("qrcode"), "https://supplyapply.pages.dev");
   </script>
 </body>
 </html>
