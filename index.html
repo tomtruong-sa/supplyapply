@@ -30,7 +30,7 @@ document.getElementById("btnLogin").addEventListener("click", async () => {
   if (!name || !pass)
     return Swal.fire("Error", "Please enter username and password", "error");
 
-  // ✅ Sử dụng đúng URL proxy Cloudflare
+  // ✅ Khai báo rõ ràng đường dẫn proxy của Cloudflare
   const proxyURL = "https://441f11b4.supplyapply.pages.dev/api/gs-proxy";
 
   Swal.fire({
@@ -43,6 +43,7 @@ document.getElementById("btnLogin").addEventListener("click", async () => {
     const res = await fetch(
       `${proxyURL}?action=checkUserLogin&name=${encodeURIComponent(name)}&pass=${encodeURIComponent(pass)}`
     );
+
     const data = await res.json();
 
     if (data.status === "ok") {
