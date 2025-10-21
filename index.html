@@ -27,13 +27,11 @@ document.getElementById("btnLogin").addEventListener("click", async () => {
   const name = document.getElementById("loginName").value.trim();
   const pass = document.getElementById("loginPass").value.trim();
 
-  if (!name || !pass) {
-    Swal.fire("Error", "Please enter username and password", "error");
-    return;
-  }
+  if (!name || !pass)
+    return Swal.fire("Error", "Please enter username and password", "error");
 
-  // ✅ Gọi qua Cloudflare Function (proxy)
-  const scriptURL = "https://155e8216.supplyapply.pages.dev/api/gs-proxy";
+  // ✅ Sử dụng đúng URL proxy Cloudflare
+  const proxyURL = "https://441f11b4.supplyapply.pages.dev/api/gs-proxy";
 
   Swal.fire({
     title: "Checking...",
@@ -42,24 +40,11 @@ document.getElementById("btnLogin").addEventListener("click", async () => {
   });
 
   try {
-    // ✅ Gửi request GET đến proxy (Cloudflare Worker)
-    const response = await fetch(
-      `${proxyURL}?action=checkUserLogin&name=${encodeURIComponent(name)}&pass=${encodeURIComponent(pass)}`,
-      { method: "GET", headers: { "Accept": "application/json" } }
+    const res = await fetch(
+      `${proxyURL}?action=checkUserLogin&name=${encodeURIComponent(name)}&pass=${encodeURIComponent(pass)}`
     );
+    const data = await res.json();
 
-    // ✅ Kiểm tra phản hồi hợp lệ
-    const text = await response.text();
-    let data;
-
-    try {
-      data = JSON.parse(text);
-    } catch {
-      console.error("Invalid JSON:", text);
-      throw new Error("Invalid JSON response from server");
-    }
-
-    // ✅ Xử lý phản hồi
     if (data.status === "ok") {
       Swal.fire({
         icon: "success",
@@ -74,7 +59,6 @@ document.getElementById("btnLogin").addEventListener("click", async () => {
     } else {
       Swal.fire("Error", data.message || "Invalid username or password", "error");
     }
-
   } catch (err) {
     console.error("❌ Fetch error:", err);
     Swal.fire("Error", "Cannot connect to server. Please try again.", "error");
