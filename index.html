@@ -28,7 +28,8 @@
     if (!name || !pass)
       return Swal.fire("Error", "Please enter your name and password", "error");
 
-    const scriptURL = "https://script.google.com/macros/s/AKfycbyNArlZ5C0Y2vd3lIK6KGw7zWKwgd5sFMvPJnCmsyFMlCqv199bbOk7rRC_zb976xF4/exec";
+    // ✅ Link Apps Script mới của bạn
+    const scriptURL = "https://script.google.com/macros/s/AKfycbyt66OV_CTcghwlt1YUxf0jO_lXhPZeW24RJ0MyMTsR7bBO69mWIRqlUvgsBLoOQaDo/exec";
 
     try {
       const formData = new FormData();
@@ -48,7 +49,10 @@
           showConfirmButton: false
         }).then(() => {
           localStorage.setItem("currentUser", JSON.stringify(json.user));
-          document.body.innerHTML = `<h2 style='text-align:center;margin-top:50px;'>Welcome ${json.user.name} (${json.user.role}) 🎉</h2>`;
+          document.body.innerHTML = `
+            <h2 style='text-align:center;margin-top:50px;'>
+              Welcome ${json.user.name} (${json.user.role}) 🎉
+            </h2>`;
         });
       } else {
         Swal.fire("Error", json.message || "Invalid username or password", "error");
