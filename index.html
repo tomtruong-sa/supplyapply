@@ -22,60 +22,41 @@
   </div>
 
   <script>
-  document.getElementById("btnLogin").addEventListener("click", async () => {
+  // === LOGIN (final stable version) ===
+document.getElementById("btnLogin").addEventListener("click", async () => {
   const name = document.getElementById("loginName").value.trim();
   const pass = document.getElementById("loginPass").value.trim();
 
-  if (!name || !pass) {
-    Swal.fire("Error", "Please enter username and password", "error");
-    return;
-  }
+  if (!name || !pass)
+    return Swal.fire("Error", "Please enter username and password", "error");
 
-  // === Gửi FormData qua Cloudflare API proxy ===
-  const formData = new FormData();
-  formData.append("action", "checkUserLogin");
-  formData.append("name", name);
-  formData.append("pass", pass);
+  const scriptURL =
+    "https://script.google.com/macros/s/AKfycbyqQ8Dvb6M9FaULKa2_UGNaA-UTIRC2fhAteF4I5CYGAOIdRnhMkH54S39bbVj1quEz/exec";
 
   Swal.fire({
     title: "Checking...",
     allowOutsideClick: false,
-    didOpen: () => Swal.showLoading()
+    didOpen: () => Swal.showLoading(),
   });
 
   try {
-    // Gọi API proxy nội bộ /api (tự động tới api.js)
-    const response = await fetch("/api", {
-      method: "POST",
-      body: formData
-    });
+    const res = await fetch(scriptURL + "?action=checkUserLogin&name=" + encodeURIComponent(name) + "&pass=" + encodeURIComponent(pass));
+    const data = await res.json();
 
-    // Nhận và parse kết quả JSON
-    const text = await response.text();
-    let data;
-    try {
-      data = JSON.parse(text);
-    } catch {
-      data = { status: "error", message: "Invalid JSON response" };
-    }
-
-    // ✅ Xử lý kết quả
     if (data.status === "ok") {
       Swal.fire({
         icon: "success",
         title: `Welcome ${data.user.name}`,
         text: `Role: ${data.user.role}`,
         timer: 1500,
-        showConfirmButton: false
+        showConfirmButton: false,
       }).then(() => {
         localStorage.setItem("currentUser", JSON.stringify(data.user));
-        // 🔁 Nếu có dashboard, đổi thành window.location.href = "dashboard.html"
         location.reload();
       });
     } else {
       Swal.fire("Error", data.message || "Invalid username or password", "error");
     }
-
   } catch (err) {
     console.error("❌ Fetch error:", err);
     Swal.fire("Error", "Cannot connect to server. Please try again.", "error");
