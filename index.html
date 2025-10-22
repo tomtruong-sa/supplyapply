@@ -3,229 +3,221 @@
 <head>
   <meta charset="UTF-8" />
   <title>SupplyApply Dashboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+  <!-- ===== LIBRARIES ===== -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
   <style>
-    body {
-      margin: 0;
-      font-family: "Segoe UI", sans-serif;
-      background: #f3f5f9;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Segoe UI", Roboto, Arial, sans-serif; }
+    body { display: flex; background: #f5f6fa; height: 100vh; overflow: hidden; }
+
+    /* === SIDEBAR === */
     .sidebar {
-      position: fixed; top: 0; left: 0; bottom: 0;
-      width: 240px;
-      background: linear-gradient(180deg, #1f2a44, #0d1b2a);
-      color: #fff; padding-top: 10px;
-      transition: width 0.3s ease;
-      overflow-y: auto; z-index: 200;
+      width: 240px; background: linear-gradient(180deg, #1f2a44 20%, #0d1b2a 80%);
+      color: white; display: flex; flex-direction: column; position: fixed; top: 0; bottom: 0;
+      transition: width 0.3s ease; z-index: 1000; box-shadow: 2px 0 8px rgba(0,0,0,0.3);
     }
-    .sidebar.collapsed { width: 70px; }
-    .logo {
-      text-align: center;
-      padding: 15px;
-      font-weight: bold;
-      background: #ffb400;
-      color: #222;
+    .sidebar nav a {
+      display: flex; align-items: center; gap: 16px; padding: 14px 20px;
+      color: #cfd8dc; text-decoration: none; font-weight: 500;
     }
-    .sidebar a {
-      display: flex; align-items: center; gap: 14px;
-      padding: 12px 20px;
-      color: #cfd8dc; text-decoration: none;
-      transition: all 0.2s ease;
-    }
-    .sidebar a:hover, .sidebar a.active { background: rgba(255,255,255,0.12); color: #fff; }
-    .sidebar a i { width: 25px; text-align: center; font-size: 1.2em; }
-    .collapse-btn {
-      position: absolute; bottom: 15px; right: -15px;
-      width: 32px; height: 32px; border-radius: 50%;
-      border: none; background: #e74c3c; color: #fff; cursor: pointer;
-    }
+    .sidebar nav a:hover, .sidebar nav a.active { background: rgba(255,255,255,0.12); color: #fff; }
+
+    /* === TOPBAR === */
     .topbar {
-      position: fixed; left: 240px; right: 0; top: 0;
-      height: 60px;
-      background: linear-gradient(90deg, #0d1b2a, #1f2a44);
-      color: white;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0 20px; transition: left 0.3s ease; z-index: 100;
+      position: fixed; top: 0; left: 240px; right: 0; height: 60px;
+      background: linear-gradient(90deg, #0d1b2a 20%, #1f2a44 80%);
+      color: white; display: flex; align-items: center; justify-content: space-between;
+      padding: 0 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.25); z-index: 999;
     }
-    .sidebar.collapsed ~ .topbar { left: 70px; }
+
+    /* === CONTENT === */
     #content {
-      margin-left: 240px; margin-top: 70px;
-      padding: 20px; transition: margin-left 0.3s ease;
+      margin-left: 240px; margin-top: 65px; padding: 20px;
+      height: calc(100vh - 65px); overflow-y: auto; transition: margin-left 0.3s ease;
+      background: #f6f8fb;
     }
-    .sidebar.collapsed ~ #content { margin-left: 70px; }
+
+    /* === LOGIN WRAPPER === */
     #login-wrapper {
       position: fixed; inset: 0;
-      background: linear-gradient(135deg, #1f2a44, #2d3f66);
       display: flex; align-items: center; justify-content: center;
-      color: white; z-index: 999;
+      background: linear-gradient(135deg, #1f2a44, #2d3f66);
+      z-index: 2000; color: white;
     }
     #login-box {
-      width: 320px; padding: 25px;
-      border-radius: 10px;
       background: rgba(255,255,255,0.1);
-      box-shadow: 0 3px 10px rgba(0,0,0,0.3);
-      text-align: center;
+      padding: 30px 40px; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+      width: 320px; text-align: center;
     }
     #login-box input {
-      width: 100%; padding: 8px; margin: 6px 0;
-      border: none; border-radius: 5px;
+      width: 100%; padding: 8px; margin: 6px 0; border: none; border-radius: 6px;
     }
     #btnLogin {
-      width: 100%; padding: 10px;
-      background: #4fc3f7; color: white;
-      border: none; border-radius: 5px;
-      cursor: pointer; font-weight: 600;
-      margin-top: 10px;
+      width: 100%; padding: 8px; background: #4fc3f7; color: #fff;
+      border: none; border-radius: 6px; cursor: pointer; margin-top: 10px; font-weight: 600;
     }
-    .hidden { display: none; }
+
+    .user-info { display: flex; align-items: center; gap: 6px; cursor: pointer; font-weight: 500; }
+    .spin { display: inline-block; animation: spin 1s linear infinite; }
+    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
   </style>
 </head>
-<body>
 
+<body>
+  <!-- ===== LOGIN ===== -->
   <div id="login-wrapper">
     <div id="login-box">
-      <h2>🔐 SupplyApply Login</h2>
-      <input type="text" id="loginName" placeholder="Username" autocomplete="off" />
-      <input type="password" id="loginPass" placeholder="Password" />
+      <h2>SupplyApply Dashboard</h2>
+      <input id="loginName" placeholder="Username" autocomplete="off" />
+      <input id="loginPass" type="password" placeholder="Password" />
       <button id="btnLogin">Login</button>
+      <div style="margin-top:10px;font-size:13px;color:#ccc;">© 2025 Supply & Apply</div>
     </div>
   </div>
 
-  <div class="sidebar hidden">
-    <div class="logo">SUPPLY & APPLY</div>
-    <nav id="menu">
-      <a href="#" data-menu="Home"><i class="bi bi-house"></i>Home</a>
-      <a href="#" data-menu="Products"><i class="bi bi-box-seam"></i>Products</a>
-      <a href="#" data-menu="Inventory"><i class="bi bi-clipboard-data"></i>Inventory</a>
-      <a href="#" data-menu="Reports"><i class="bi bi-graph-up"></i>Reports</a>
-      <a href="#" data-menu="Settings"><i class="bi bi-gear"></i>Settings</a>
+  <!-- ===== SIDEBAR ===== -->
+  <div class="sidebar" style="display:none;">
+    <div class="logo" style="text-align:center;padding:18px 0;font-weight:bold;">SUPPLY & APPLY</div>
+    <nav>
+      <a href="#" data-menu="Home" class="active"><i class="bi bi-house"></i><span>Home</span></a>
+      <a href="#" data-menu="Products"><i class="bi bi-box"></i><span>Products</span></a>
+      <a href="#" data-menu="Inventory"><i class="bi bi-layers"></i><span>Inventory</span></a>
+      <a href="#" data-menu="Reports"><i class="bi bi-bar-chart"></i><span>Reports</span></a>
+      <a href="#" data-menu="Settings"><i class="bi bi-gear"></i><span>Settings</span></a>
     </nav>
-    <button class="collapse-btn"><i class="bi bi-arrow-left-short"></i></button>
   </div>
 
-  <div class="topbar hidden">
-    <div id="datetime">--:--</div>
-    <div><i class="bi bi-person-circle"></i> <span id="userName"></span> | <a href="#" id="logout" style="color:#f88;">Logout</a></div>
+  <!-- ===== TOPBAR ===== -->
+  <div class="topbar" style="display:none;">
+    <div id="datetime"></div>
+    <div class="user-info">
+      <i class="bi bi-person-circle"></i> <span id="user-name">User</span>
+      <button id="btnLogout" style="background:none;border:none;color:#fff;margin-left:10px;cursor:pointer;"><i class="bi bi-box-arrow-right"></i></button>
+    </div>
   </div>
 
-  <div id="content" class="hidden"></div>
+  <!-- ===== CONTENT ===== -->
+  <div id="content" style="display:none;"></div>
 
-<script>
-const proxyURL = "https://441f11b4.supplyapply.pages.dev/api/gs-proxy";
+  <!-- ===== JS ===== -->
+  <script>
+  const proxyURL = "https://441f11b4.supplyapply.pages.dev/api/gs-proxy";
 
-// === LOGIN ===
-document.getElementById("btnLogin").addEventListener("click", async () => {
-  const name = document.getElementById("loginName").value.trim();
-  const pass = document.getElementById("loginPass").value.trim();
-  if (!name || !pass) return Swal.fire("Error", "Please enter username and password", "error");
+  // === LOGIN ===
+  document.getElementById("btnLogin").addEventListener("click", async () => {
+    const name = document.getElementById("loginName").value.trim();
+    const pass = document.getElementById("loginPass").value.trim();
+    if (!name || !pass)
+      return Swal.fire("Error", "Please enter username and password", "error");
 
-  Swal.fire({title:"Checking...",didOpen:()=>Swal.showLoading(),allowOutsideClick:false});
-  try {
-    const res = await fetch(`${proxyURL}?action=login&user=${encodeURIComponent(name)}&pass=${encodeURIComponent(pass)}`);
-    const text = (await res.text()).trim();
+    Swal.fire({ title: "Checking...", allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
-    console.log("Server response:", text);
-
-    let data;
     try {
-      data = JSON.parse(text);
-    } catch {
-      // ✅ Nếu trả về text hoặc HTML
-      if (text.toLowerCase().includes("login successful") || text.toLowerCase().includes("get action login processed")) {
-        data = {
-          status: "ok",
-          user: { name, allowedMenus: "Home,Products,Inventory,Reports,Settings" }
-        };
-      } else if (text.toLowerCase().includes("<html")) {
-        data = { status: "error", message: "Invalid JSON from Apps Script" };
-      } else {
-        data = { status: "error", message: text };
+      const res = await fetch(`${proxyURL}?action=login&user=${encodeURIComponent(name)}&pass=${encodeURIComponent(pass)}`);
+      const text = (await res.text()).trim();
+      console.log("Server response:", text);
+
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        if (text.toLowerCase().includes("login successful") || text.toLowerCase().includes("get action login processed")) {
+          data = {
+            success: true,
+            role: "Admin",
+            allowedMenus: ["Home", "Products", "Inventory", "Reports", "Settings"]
+          };
+        } else {
+          data = { success: false, message: text };
+        }
       }
-    }
 
-    if (data.status === "ok") {
       Swal.close();
-      showDashboard(data.user);
-    } else {
-      Swal.fire("Error", data.message || "Invalid credentials", "error");
+      if (data.success) {
+        Swal.fire({
+          icon: "success",
+          title: `Welcome ${name}`,
+          text: `Role: ${data.role}`,
+          timer: 1000,
+          showConfirmButton: false
+        }).then(() => {
+          localStorage.setItem("currentUser", JSON.stringify({ name, role: data.role, allowedMenus: data.allowedMenus }));
+          showDashboard({ name, role: data.role, allowedMenus: data.allowedMenus });
+        });
+      } else {
+        Swal.fire("Error", data.message || "Invalid username or password", "error");
+      }
+    } catch (err) {
+      Swal.fire("Error", "Unable to connect to server", "error");
+      console.error(err);
     }
-
-  } catch (err) {
-    Swal.fire("Error", "Cannot connect to server. Please try again.", "error");
-    console.error("Fetch error:", err);
-  }
-});
-
-// === DASHBOARD ===
-function showDashboard(user){
-  localStorage.setItem("user", JSON.stringify(user));
-  document.getElementById("login-wrapper").classList.add("hidden");
-  document.querySelector(".sidebar").classList.remove("hidden");
-  document.querySelector(".topbar").classList.remove("hidden");
-  document.getElementById("content").classList.remove("hidden");
-  document.getElementById("userName").textContent = user.name;
-  loadModule(user.allowedMenus.split(",")[0] || "Home");
-}
-
-// === LOGOUT ===
-document.getElementById("logout").addEventListener("click",()=>{
-  localStorage.removeItem("user");
-  location.reload();
-});
-
-// === SIDEBAR TOGGLE ===
-document.querySelector(".collapse-btn").addEventListener("click",()=>{
-  document.querySelector(".sidebar").classList.toggle("collapsed");
-});
-
-// === MENU CLICK ===
-document.querySelectorAll("#menu a").forEach(a=>{
-  a.addEventListener("click",e=>{
-    e.preventDefault();
-    document.querySelectorAll("#menu a").forEach(x=>x.classList.remove("active"));
-    a.classList.add("active");
-    loadModule(a.dataset.menu);
   });
-});
 
-// === MODULES ===
-function loadModule(name){
-  const c=document.getElementById("content");
-  if(name==="Home"){
-    c.innerHTML=`<h2>🏠 Home</h2><div id="qrcode"></div>`;
-    new QRCode(document.getElementById("qrcode"),window.location.href);
-  }
-  else if(name==="Products"){
-    c.innerHTML=`<h2>📦 Products</h2>
-      <table id="prod" class="display">
-      <thead><tr><th>Code</th><th>Name</th><th>Qty</th></tr></thead>
-      <tbody><tr><td>P001</td><td>Sample Product</td><td>50</td></tr></tbody></table>`;
-    setTimeout(()=>$('#prod').DataTable(),100);
-  }
-  else if(name==="Inventory"){
-    c.innerHTML=`<h2>📊 Inventory</h2><p>Coming soon...</p>`;
-  }
-  else if(name==="Reports"){
-    c.innerHTML=`<h2>📑 Reports</h2><p>Report module loading...</p>`;
-  }
-  else if(name==="Settings"){
-    c.innerHTML=`<h2>⚙️ Settings</h2><p>Manage users and preferences.</p>`;
-  }
-}
+  // === AUTO LOGIN IF SAVED ===
+  document.addEventListener("DOMContentLoaded", () => {
+    const saved = localStorage.getItem("currentUser");
+    if (saved) showDashboard(JSON.parse(saved));
+  });
 
-// === DATETIME REALTIME ===
-setInterval(()=>{document.getElementById("datetime").textContent=new Date().toLocaleString();},1000);
+  // === DASHBOARD / LOGIN TOGGLE ===
+  function showDashboard(user) {
+    document.getElementById("login-wrapper").style.display = "none";
+    document.querySelector(".sidebar").style.display = "flex";
+    document.querySelector(".topbar").style.display = "flex";
+    document.getElementById("content").style.display = "block";
+    document.getElementById("user-name").textContent = user.name;
+    applyUserMenus(user.allowedMenus);
+    loadModule("Home");
+  }
 
-// === AUTO RESTORE LOGIN ===
-const saved = localStorage.getItem("user");
-if(saved) showDashboard(JSON.parse(saved));
-</script>
+  // === LOGOUT ===
+  document.getElementById("btnLogout").addEventListener("click", () => {
+    Swal.fire({
+      title: "Log out?",
+      text: "See you again.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Logout"
+    }).then(res => {
+      if (res.isConfirmed) {
+        localStorage.removeItem("currentUser");
+        location.reload();
+      }
+    });
+  });
+
+  // === APPLY USER MENUS ===
+  function applyUserMenus(allowedMenus) {
+    document.querySelectorAll(".sidebar nav a").forEach(link => {
+      link.style.display = allowedMenus.includes(link.dataset.menu) ? "flex" : "none";
+    });
+  }
+
+  // === MODULE LOADER ===
+  document.querySelectorAll(".sidebar nav a").forEach(link => {
+    link.addEventListener("click", e => {
+      e.preventDefault();
+      document.querySelectorAll(".sidebar nav a").forEach(l => l.classList.remove("active"));
+      link.classList.add("active");
+      loadModule(link.dataset.menu);
+    });
+  });
+
+  function loadModule(name) {
+    const c = document.getElementById("content");
+    if (name === "Home") c.innerHTML = `<h2>🏠 Home</h2><p>Welcome to <b>SupplyApply Dashboard</b>.</p>`;
+    if (name === "Products") c.innerHTML = `<h2>📦 Products</h2><p>Product data will appear here.</p>`;
+    if (name === "Reports") c.innerHTML = `<h2>📊 Reports</h2><p>Report center (Morning, Today, General...)</p>`;
+    if (name === "Settings") c.innerHTML = `<h2>⚙️ Settings</h2><p>User configuration panel.</p>`;
+  }
+
+  // === CLOCK ===
+  setInterval(() => { document.getElementById("datetime").textContent = new Date().toLocaleString(); }, 1000);
+  </script>
 </body>
 </html>
