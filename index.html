@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>SupplyApply Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <!-- ===== LIBRARIES ===== -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -104,11 +105,9 @@
   <!-- ===== CONTENT ===== -->
   <div id="content" style="display:none;"></div>
 
-  <!-- ===== JS ===== -->
   <script>
   const proxyURL = "https://441f11b4.supplyapply.pages.dev/api/gs-proxy";
 
-  // === LOGIN ===
   document.getElementById("btnLogin").addEventListener("click", async () => {
     const name = document.getElementById("loginName").value.trim();
     const pass = document.getElementById("loginPass").value.trim();
@@ -119,13 +118,14 @@
 
     try {
       const res = await fetch(`${proxyURL}?action=login&user=${encodeURIComponent(name)}&pass=${encodeURIComponent(pass)}`);
-      const text = (await res.text()).trim();
-      console.log("Server response:", text);
+      const text = await res.text();
+      console.log("Server raw response:", text);
 
       let data;
       try {
         data = JSON.parse(text);
       } catch {
+        // nếu chỉ là text từ proxy
         if (text.toLowerCase().includes("login successful") || text.toLowerCase().includes("get action login processed")) {
           data = {
             success: true,
@@ -138,6 +138,7 @@
       }
 
       Swal.close();
+
       if (data.success) {
         Swal.fire({
           icon: "success",
@@ -152,9 +153,10 @@
       } else {
         Swal.fire("Error", data.message || "Invalid username or password", "error");
       }
+
     } catch (err) {
-      Swal.fire("Error", "Unable to connect to server", "error");
-      console.error(err);
+      console.error("Fetch error:", err);
+      Swal.fire("Error", "Cannot connect to server or proxy failed", "error");
     }
   });
 
@@ -164,7 +166,7 @@
     if (saved) showDashboard(JSON.parse(saved));
   });
 
-  // === DASHBOARD / LOGIN TOGGLE ===
+  // === DASHBOARD ===
   function showDashboard(user) {
     document.getElementById("login-wrapper").style.display = "none";
     document.querySelector(".sidebar").style.display = "flex";
@@ -191,14 +193,14 @@
     });
   });
 
-  // === APPLY USER MENUS ===
+  // === USER MENU FILTER ===
   function applyUserMenus(allowedMenus) {
     document.querySelectorAll(".sidebar nav a").forEach(link => {
       link.style.display = allowedMenus.includes(link.dataset.menu) ? "flex" : "none";
     });
   }
 
-  // === MODULE LOADER ===
+  // === LOAD MODULE ===
   document.querySelectorAll(".sidebar nav a").forEach(link => {
     link.addEventListener("click", e => {
       e.preventDefault();
