@@ -120,6 +120,7 @@
 <script>
 const proxyURL = "https://441f11b4.supplyapply.pages.dev/api/gs-proxy";
 
+// === LOGIN ===
 document.getElementById("btnLogin").addEventListener("click", async () => {
   const name = document.getElementById("loginName").value.trim();
   const pass = document.getElementById("loginPass").value.trim();
@@ -128,13 +129,16 @@ document.getElementById("btnLogin").addEventListener("click", async () => {
   Swal.fire({title:"Checking...",didOpen:()=>Swal.showLoading(),allowOutsideClick:false});
   try {
     const res = await fetch(`${proxyURL}?action=login&user=${encodeURIComponent(name)}&pass=${encodeURIComponent(pass)}`);
-    const text = await res.text();
+    const text = (await res.text()).trim();
+
+    console.log("Server response:", text);
 
     let data;
     try {
       data = JSON.parse(text);
     } catch {
-      if (text.toLowerCase().includes("login successful")) {
+      // ✅ xử lý mọi kiểu text phản hồi
+      if (text.toLowerCase().includes("login successful") || text.toLowerCase().includes("get action login processed")) {
         data = {
           status: "ok",
           user: { name, allowedMenus: "Home,Products,Inventory,Reports,Settings" }
@@ -157,6 +161,7 @@ document.getElementById("btnLogin").addEventListener("click", async () => {
   }
 });
 
+// === DASHBOARD ===
 function showDashboard(user){
   localStorage.setItem("user", JSON.stringify(user));
   document.getElementById("login-wrapper").classList.add("hidden");
@@ -167,15 +172,18 @@ function showDashboard(user){
   loadModule(user.allowedMenus.split(",")[0] || "Home");
 }
 
+// === LOGOUT ===
 document.getElementById("logout").addEventListener("click",()=>{
   localStorage.removeItem("user");
   location.reload();
 });
 
+// === SIDEBAR TOGGLE ===
 document.querySelector(".collapse-btn").addEventListener("click",()=>{
   document.querySelector(".sidebar").classList.toggle("collapsed");
 });
 
+// === MENU CLICK ===
 document.querySelectorAll("#menu a").forEach(a=>{
   a.addEventListener("click",e=>{
     e.preventDefault();
@@ -185,6 +193,7 @@ document.querySelectorAll("#menu a").forEach(a=>{
   });
 });
 
+// === MODULES ===
 function loadModule(name){
   const c=document.getElementById("content");
   if(name==="Home"){
@@ -192,7 +201,10 @@ function loadModule(name){
     new QRCode(document.getElementById("qrcode"),window.location.href);
   }
   else if(name==="Products"){
-    c.innerHTML=`<h2>📦 Products</h2><table id="prod" class="display"><thead><tr><th>Code</th><th>Name</th><th>Qty</th></tr></thead><tbody><tr><td>P001</td><td>Sample</td><td>50</td></tr></tbody></table>`;
+    c.innerHTML=`<h2>📦 Products</h2>
+      <table id="prod" class="display">
+      <thead><tr><th>Code</th><th>Name</th><th>Qty</th></tr></thead>
+      <tbody><tr><td>P001</td><td>Sample Product</td><td>50</td></tr></tbody></table>`;
     setTimeout(()=>$('#prod').DataTable(),100);
   }
   else if(name==="Inventory"){
@@ -202,11 +214,14 @@ function loadModule(name){
     c.innerHTML=`<h2>📑 Reports</h2><p>Report module loading...</p>`;
   }
   else if(name==="Settings"){
-    c.innerHTML=`<h2>⚙️ Settings</h2><p>Manage your users and preferences.</p>`;
+    c.innerHTML=`<h2>⚙️ Settings</h2><p>Manage users and preferences.</p>`;
   }
 }
 
+// === DATETIME REALTIME ===
 setInterval(()=>{document.getElementById("datetime").textContent=new Date().toLocaleString();},1000);
+
+// === AUTO RESTORE LOGIN ===
 const saved = localStorage.getItem("user");
 if(saved) showDashboard(JSON.parse(saved));
 </script>
