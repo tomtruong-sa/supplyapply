@@ -1,29 +1,215 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>SupplyApply Dashboard – One File Edition</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+  <meta charset="UTF-8" />
+  <title>SupplyApply Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
   <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <style>
-    body { background: linear-gradient(180deg, #1f2a44 20%, #0d1b2a 80%); color: white; font-family: 'Segoe UI'; }
-    .center { text-align: center; padding: 100px; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", sans-serif;
+      background: #f3f5f9;
+    }
+    .sidebar {
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      width: 240px;
+      background: linear-gradient(180deg, #1f2a44, #0d1b2a);
+      color: #fff;
+      padding-top: 10px;
+      transition: width 0.3s ease;
+      overflow-y: auto;
+      z-index: 200;
+    }
+    .sidebar.collapsed { width: 70px; }
+    .logo {
+      text-align: center;
+      padding: 15px;
+      font-weight: bold;
+      background: #ffb400;
+      color: #222;
+    }
+    .sidebar a {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 20px;
+      color: #cfd8dc;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    .sidebar a:hover, .sidebar a.active { background: rgba(255,255,255,0.12); color: #fff; }
+    .sidebar a i { width: 25px; text-align: center; font-size: 1.2em; }
+    .collapse-btn {
+      position: absolute;
+      bottom: 15px;
+      right: -15px;
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      border: none; background: #e74c3c; color: #fff;
+      cursor: pointer;
+    }
+    .topbar {
+      position: fixed;
+      left: 240px; right: 0; top: 0;
+      height: 60px;
+      background: linear-gradient(90deg, #0d1b2a, #1f2a44);
+      color: white;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 20px;
+      transition: left 0.3s ease;
+      z-index: 100;
+    }
+    .sidebar.collapsed ~ .topbar { left: 70px; }
+    #content {
+      margin-left: 240px;
+      margin-top: 70px;
+      padding: 20px;
+      transition: margin-left 0.3s ease;
+    }
+    .sidebar.collapsed ~ #content { margin-left: 70px; }
+    #login-wrapper {
+      position: fixed; inset: 0;
+      background: linear-gradient(135deg, #1f2a44, #2d3f66);
+      display: flex; align-items: center; justify-content: center;
+      color: white; z-index: 999;
+    }
+    #login-box {
+      width: 320px; padding: 25px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.1);
+      box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+      text-align: center;
+    }
+    #login-box input {
+      width: 100%; padding: 8px; margin: 6px 0;
+      border: none; border-radius: 5px;
+    }
+    #btnLogin {
+      width: 100%; padding: 10px;
+      background: #4fc3f7; color: white;
+      border: none; border-radius: 5px;
+      cursor: pointer; font-weight: 600;
+      margin-top: 10px;
+    }
+    .hidden { display: none; }
   </style>
 </head>
 <body>
-  <div class="center">
-    <h1>SupplyApply Dashboard – One File Edition</h1>
-    <p>✅ Full system with proxy, QR code, DataTables, Weather, and Lazy Load integrated.</p>
-    <div id="qrcode"></div>
+  <div id="login-wrapper">
+    <div id="login-box">
+      <h2>🔐 SupplyApply Login</h2>
+      <input type="text" id="loginName" placeholder="Username" autocomplete="off" />
+      <input type="password" id="loginPass" placeholder="Password" />
+      <button id="btnLogin">Login</button>
+    </div>
   </div>
-  <script>
-    const proxyURL = "https://441f11b4.supplyapply.pages.dev/api/gs-proxy";
-    new QRCode(document.getElementById("qrcode"), "https://supplyapply.pages.dev");
-  </script>
+
+  <div class="sidebar hidden">
+    <div class="logo">SUPPLY & APPLY</div>
+    <nav id="menu">
+      <a href="#" data-menu="Home"><i class="bi bi-house"></i>Home</a>
+      <a href="#" data-menu="Products"><i class="bi bi-box-seam"></i>Products</a>
+      <a href="#" data-menu="Inventory"><i class="bi bi-clipboard-data"></i>Inventory</a>
+      <a href="#" data-menu="Reports"><i class="bi bi-graph-up"></i>Reports</a>
+      <a href="#" data-menu="Settings"><i class="bi bi-gear"></i>Settings</a>
+    </nav>
+    <button class="collapse-btn"><i class="bi bi-arrow-left-short"></i></button>
+  </div>
+
+  <div class="topbar hidden">
+    <div id="datetime">--:--</div>
+    <div><i class="bi bi-person-circle"></i> <span id="userName"></span> | <a href="#" id="logout" style="color:#f88;">Logout</a></div>
+  </div>
+
+  <div id="content" class="hidden"></div>
+
+<script>
+const proxyURL = "https://441f11b4.supplyapply.pages.dev/api/gs-proxy";
+
+document.getElementById("btnLogin").addEventListener("click", async () => {
+  const name = document.getElementById("loginName").value.trim();
+  const pass = document.getElementById("loginPass").value.trim();
+  if (!name || !pass) return Swal.fire("Error", "Please enter username and password", "error");
+
+  Swal.fire({title:"Checking...",didOpen:()=>Swal.showLoading(),allowOutsideClick:false});
+  try {
+    const res = await fetch(`${proxyURL}?action=login&user=${encodeURIComponent(name)}&pass=${encodeURIComponent(pass)}`);
+    const data = await res.json();
+    if (data.status === "ok") {
+      Swal.close();
+      showDashboard(data.user);
+    } else {
+      Swal.fire("Error", data.message || "Invalid credentials", "error");
+    }
+  } catch (err) {
+    Swal.fire("Error", "Cannot connect to server", "error");
+  }
+});
+
+function showDashboard(user){
+  localStorage.setItem("user", JSON.stringify(user));
+  document.getElementById("login-wrapper").classList.add("hidden");
+  document.querySelector(".sidebar").classList.remove("hidden");
+  document.querySelector(".topbar").classList.remove("hidden");
+  document.getElementById("content").classList.remove("hidden");
+  document.getElementById("userName").textContent = user.name;
+  loadModule(user.allowedMenus.split(",")[0] || "Home");
+}
+
+document.getElementById("logout").addEventListener("click",()=>{
+  localStorage.removeItem("user");
+  location.reload();
+});
+
+// Sidebar toggle
+document.querySelector(".collapse-btn").addEventListener("click",()=>{
+  document.querySelector(".sidebar").classList.toggle("collapsed");
+});
+
+// Menu click
+document.querySelectorAll("#menu a").forEach(a=>{
+  a.addEventListener("click",e=>{
+    e.preventDefault();
+    document.querySelectorAll("#menu a").forEach(x=>x.classList.remove("active"));
+    a.classList.add("active");
+    loadModule(a.dataset.menu);
+  });
+});
+
+function loadModule(name){
+  const c=document.getElementById("content");
+  if(name==="Home"){
+    c.innerHTML=`<h2>🏠 Home</h2><div id="qrcode"></div>`;
+    new QRCode(document.getElementById("qrcode"),window.location.href);
+  }
+  else if(name==="Products"){
+    c.innerHTML=`<h2>📦 Products</h2><table id="prod" class="display"><thead><tr><th>Code</th><th>Name</th><th>Qty</th></tr></thead><tbody><tr><td>P001</td><td>Sample</td><td>50</td></tr></tbody></table>`;
+    setTimeout(()=>$('#prod').DataTable(),100);
+  }
+  else if(name==="Inventory"){
+    c.innerHTML=`<h2>📊 Inventory</h2><p>Coming soon...</p>`;
+  }
+  else if(name==="Reports"){
+    c.innerHTML=`<h2>📑 Reports</h2><p>Report module loading...</p>`;
+  }
+  else if(name==="Settings"){
+    c.innerHTML=`<h2>⚙️ Settings</h2><p>Manage your users and preferences.</p>`;
+  }
+}
+
+// Clock realtime
+setInterval(()=>{document.getElementById("datetime").textContent=new Date().toLocaleString();},1000);
+
+// Restore login if cached
+const saved = localStorage.getItem("user");
+if(saved) showDashboard(JSON.parse(saved));
+</script>
 </body>
 </html>
