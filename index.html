@@ -10,6 +10,7 @@
   <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
   <style>
     body {
       margin: 0;
@@ -17,15 +18,12 @@
       background: #f3f5f9;
     }
     .sidebar {
-      position: fixed;
-      top: 0; left: 0; bottom: 0;
+      position: fixed; top: 0; left: 0; bottom: 0;
       width: 240px;
       background: linear-gradient(180deg, #1f2a44, #0d1b2a);
-      color: #fff;
-      padding-top: 10px;
+      color: #fff; padding-top: 10px;
       transition: width 0.3s ease;
-      overflow-y: auto;
-      z-index: 200;
+      overflow-y: auto; z-index: 200;
     }
     .sidebar.collapsed { width: 70px; }
     .logo {
@@ -36,42 +34,30 @@
       color: #222;
     }
     .sidebar a {
-      display: flex;
-      align-items: center;
-      gap: 14px;
+      display: flex; align-items: center; gap: 14px;
       padding: 12px 20px;
-      color: #cfd8dc;
-      text-decoration: none;
+      color: #cfd8dc; text-decoration: none;
       transition: all 0.2s ease;
     }
     .sidebar a:hover, .sidebar a.active { background: rgba(255,255,255,0.12); color: #fff; }
     .sidebar a i { width: 25px; text-align: center; font-size: 1.2em; }
     .collapse-btn {
-      position: absolute;
-      bottom: 15px;
-      right: -15px;
-      width: 32px; height: 32px;
-      border-radius: 50%;
-      border: none; background: #e74c3c; color: #fff;
-      cursor: pointer;
+      position: absolute; bottom: 15px; right: -15px;
+      width: 32px; height: 32px; border-radius: 50%;
+      border: none; background: #e74c3c; color: #fff; cursor: pointer;
     }
     .topbar {
-      position: fixed;
-      left: 240px; right: 0; top: 0;
+      position: fixed; left: 240px; right: 0; top: 0;
       height: 60px;
       background: linear-gradient(90deg, #0d1b2a, #1f2a44);
       color: white;
       display: flex; align-items: center; justify-content: space-between;
-      padding: 0 20px;
-      transition: left 0.3s ease;
-      z-index: 100;
+      padding: 0 20px; transition: left 0.3s ease; z-index: 100;
     }
     .sidebar.collapsed ~ .topbar { left: 70px; }
     #content {
-      margin-left: 240px;
-      margin-top: 70px;
-      padding: 20px;
-      transition: margin-left 0.3s ease;
+      margin-left: 240px; margin-top: 70px;
+      padding: 20px; transition: margin-left 0.3s ease;
     }
     .sidebar.collapsed ~ #content { margin-left: 70px; }
     #login-wrapper {
@@ -102,6 +88,7 @@
   </style>
 </head>
 <body>
+
   <div id="login-wrapper">
     <div id="login-box">
       <h2>🔐 SupplyApply Login</h2>
@@ -141,32 +128,33 @@ document.getElementById("btnLogin").addEventListener("click", async () => {
   Swal.fire({title:"Checking...",didOpen:()=>Swal.showLoading(),allowOutsideClick:false});
   try {
     const res = await fetch(`${proxyURL}?action=login&user=${encodeURIComponent(name)}&pass=${encodeURIComponent(pass)}`);
-const text = await res.text();
+    const text = await res.text();
 
-let data;
-try {
-  data = JSON.parse(text); // nếu là JSON thật
-} catch {
-  // nếu proxy trả về text thuần như "Login successful"
-  if (text.toLowerCase().includes("login successful")) {
-    data = {
-      status: "ok",
-      user: { 
-        name: name,
-        allowedMenus: "Home,Products,Inventory,Reports,Settings"
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      if (text.toLowerCase().includes("login successful")) {
+        data = {
+          status: "ok",
+          user: { name, allowedMenus: "Home,Products,Inventory,Reports,Settings" }
+        };
+      } else {
+        data = { status: "error", message: text };
       }
-    };
-  } else {
-    data = { status: "error", message: text };
-  }
-}
+    }
 
-if (data.status === "ok") {
-  Swal.close();
-  showDashboard(data.user);
-} else {
-  Swal.fire("Error", data.message || "Invalid credentials", "error");
-}
+    if (data.status === "ok") {
+      Swal.close();
+      showDashboard(data.user);
+    } else {
+      Swal.fire("Error", data.message || "Invalid credentials", "error");
+    }
+
+  } catch (err) {
+    Swal.fire("Error", "Cannot connect to server. Please try again.", "error");
+    console.error("Fetch error:", err);
+  }
 });
 
 function showDashboard(user){
@@ -184,12 +172,10 @@ document.getElementById("logout").addEventListener("click",()=>{
   location.reload();
 });
 
-// Sidebar toggle
 document.querySelector(".collapse-btn").addEventListener("click",()=>{
   document.querySelector(".sidebar").classList.toggle("collapsed");
 });
 
-// Menu click
 document.querySelectorAll("#menu a").forEach(a=>{
   a.addEventListener("click",e=>{
     e.preventDefault();
@@ -220,10 +206,7 @@ function loadModule(name){
   }
 }
 
-// Clock realtime
 setInterval(()=>{document.getElementById("datetime").textContent=new Date().toLocaleString();},1000);
-
-// Restore login if cached
 const saved = localStorage.getItem("user");
 if(saved) showDashboard(JSON.parse(saved));
 </script>
