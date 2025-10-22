@@ -141,31 +141,32 @@ document.getElementById("btnLogin").addEventListener("click", async () => {
   Swal.fire({title:"Checking...",didOpen:()=>Swal.showLoading(),allowOutsideClick:false});
   try {
     const res = await fetch(`${proxyURL}?action=login&user=${encodeURIComponent(name)}&pass=${encodeURIComponent(pass)}`);
-    const text = await res.text();
+const text = await res.text();
 
-    let data;
-    try {
-      data = JSON.parse(text);
-    } catch {
-      // fallback: if server returns plain text like "Login successful"
-      if (text.toLowerCase().includes("login successful")) {
-        data = {
-          status: "ok",
-          user: { name, allowedMenus: "Home,Products,Inventory,Reports,Settings" }
-        };
-      } else {
-        data = { status: "error", message: text };
+let data;
+try {
+  data = JSON.parse(text); // nếu là JSON thật
+} catch {
+  // nếu proxy trả về text thuần như "Login successful"
+  if (text.toLowerCase().includes("login successful")) {
+    data = {
+      status: "ok",
+      user: { 
+        name: name,
+        allowedMenus: "Home,Products,Inventory,Reports,Settings"
       }
-    }
-    if (data.status === "ok") {
-      Swal.close();
-      showDashboard(data.user);
-    } else {
-      Swal.fire("Error", data.message || "Invalid credentials", "error");
-    }
-  } catch (err) {
-    Swal.fire("Error", "Cannot connect to server", "error");
+    };
+  } else {
+    data = { status: "error", message: text };
   }
+}
+
+if (data.status === "ok") {
+  Swal.close();
+  showDashboard(data.user);
+} else {
+  Swal.fire("Error", data.message || "Invalid credentials", "error");
+}
 });
 
 function showDashboard(user){
