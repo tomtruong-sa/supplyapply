@@ -141,7 +141,22 @@ document.getElementById("btnLogin").addEventListener("click", async () => {
   Swal.fire({title:"Checking...",didOpen:()=>Swal.showLoading(),allowOutsideClick:false});
   try {
     const res = await fetch(`${proxyURL}?action=login&user=${encodeURIComponent(name)}&pass=${encodeURIComponent(pass)}`);
-    const data = await res.json();
+    const text = await res.text();
+
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      // fallback: if server returns plain text like "Login successful"
+      if (text.toLowerCase().includes("login successful")) {
+        data = {
+          status: "ok",
+          user: { name, allowedMenus: "Home,Products,Inventory,Reports,Settings" }
+        };
+      } else {
+        data = { status: "error", message: text };
+      }
+    }
     if (data.status === "ok") {
       Swal.close();
       showDashboard(data.user);
