@@ -137,12 +137,14 @@ document.getElementById("btnLogin").addEventListener("click", async () => {
     try {
       data = JSON.parse(text);
     } catch {
-      // ✅ xử lý mọi kiểu text phản hồi
+      // ✅ Nếu trả về text hoặc HTML
       if (text.toLowerCase().includes("login successful") || text.toLowerCase().includes("get action login processed")) {
         data = {
           status: "ok",
           user: { name, allowedMenus: "Home,Products,Inventory,Reports,Settings" }
         };
+      } else if (text.toLowerCase().includes("<html")) {
+        data = { status: "error", message: "Invalid JSON from Apps Script" };
       } else {
         data = { status: "error", message: text };
       }
